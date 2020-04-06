@@ -113,6 +113,11 @@ options:
       - The image to use when I(provision_method=image).
     type: str
     required: false
+  interfaces_attributes:
+    description:
+      - Interfaces attributes related to this host.
+    type: list
+    elements: dict
 extends_documentation_fragment:
   - foreman
   - foreman.entity_state
@@ -166,6 +171,40 @@ from ansible.module_utils.foreman_helper import (
     HostMixin,
 )
 
+interface_attribute_foreman_spec = {
+  'mac': dict(type='string'),
+  'ip': dict(type='string'),
+  'ip6': dict(type='string'),
+  'type': dict(type='string', choices=[
+      'interface',
+      'bmc',
+      'bond',
+      'bridge'
+    ]),
+  'name': dict(type='string'),
+  'mode': dict(type='string', choices=[
+      'balance-rr',
+      'active-backup',
+      'balance-xor',
+      'broadcast',
+      '802.3ad',
+      'balance-tlb',
+      'balance-alb'
+    ]),
+  'subnet': dict(type='entity', flat_name='subnet_id', resource_type='subnet'),
+  'domain': dict(type='entity', flat_name='domain_id', resource_type='domain'),
+  'identifier': dict(type='string'),
+  'managed': dict(type='bool'),
+  'primary': dict(type='bool'),
+  'provision': dict(type='bool'),
+  'virtual': dict(type='bool'),
+  'tag': dict(type='int'),
+  'attached_devices': dict(type='list', elements='str'),
+  'attached_to': dict(type='string'),
+  'bond_options': dict(type='string'),
+  'mtu': dict(type='int'),
+
+}
 
 class ForemanHostModule(HostMixin, ForemanEntityAnsibleModule):
     pass
@@ -189,6 +228,7 @@ def main():
             owner_type=dict(type='invisible'),
             provision_method=dict(choices=['build', 'image', 'bootdisk']),
             image=dict(type='entity'),
+            interfaces_attributes=dict(type='nested_list', foreman_spec=interface_attribute_foreman_spec),
         ),
         mutually_exclusive=[
             ['owner', 'owner_group']
