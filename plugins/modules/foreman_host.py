@@ -172,17 +172,16 @@ from ansible.module_utils.foreman_helper import (
 )
 
 interface_attribute_foreman_spec = {
-  'mac': dict(type='string'),
-  'ip': dict(type='string'),
-  'ip6': dict(type='string'),
-  'type': dict(type='string', choices=[
+  'mac': dict(type='str'),
+  'ip': dict(type='str'),
+  'type': dict(type='str', choices=[
       'interface',
       'bmc',
       'bond',
       'bridge'
     ]),
-  'name': dict(type='string'),
-  'mode': dict(type='string', choices=[
+  'name': dict(type='str'),
+  'mode': dict(type='str', choices=[
       'balance-rr',
       'active-backup',
       'balance-xor',
@@ -191,17 +190,17 @@ interface_attribute_foreman_spec = {
       'balance-tlb',
       'balance-alb'
     ]),
-  'subnet': dict(type='entity', flat_name='subnet_id', resource_type='subnet'),
-  'domain': dict(type='entity', flat_name='domain_id', resource_type='domain'),
-  'identifier': dict(type='string'),
+  'subnet': dict(type='entity', flat_name='subnet_id', resource_type='subnets'),
+  'domain': dict(type='entity', flat_name='domain_id', resource_type='domains'),
+  'identifier': dict(type='str'),
   'managed': dict(type='bool'),
   'primary': dict(type='bool'),
   'provision': dict(type='bool'),
   'virtual': dict(type='bool'),
   'tag': dict(type='int'),
   'attached_devices': dict(type='list', elements='str'),
-  'attached_to': dict(type='string'),
-  'bond_options': dict(type='string'),
+  'attached_to': dict(type='str'),
+  'bond_options': dict(type='str'),
   'mtu': dict(type='int'),
 
 }
@@ -220,8 +219,6 @@ def main():
             enabled=dict(type='bool'),
             managed=dict(type='bool'),
             build=dict(type='bool'),
-            ip=dict(),
-            mac=dict(),
             comment=dict(),
             owner=dict(type='entity', resource_type='users', flat_name='owner_id'),
             owner_group=dict(type='entity', resource_type='usergroups', flat_name='owner_id'),
@@ -248,9 +245,6 @@ def main():
         elif 'build' not in module.foreman_params and 'managed' in module.foreman_params and not module.foreman_params['managed']:
             # When 'build' is not given and 'managed'=False, have to clear 'build' context that might exist on the server.
             module.foreman_params['build'] = False
-
-        if 'mac' in module.foreman_params:
-            module.foreman_params['mac'] = module.foreman_params['mac'].lower()
 
         if 'owner' in module.foreman_params:
             module.foreman_params['owner_type'] = 'User'
